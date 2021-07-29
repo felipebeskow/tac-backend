@@ -2,6 +2,8 @@ const http = require("http");
 const express = require("express");
 const app = express();
 
+app.use(express.json());
+
 app.use('/', require('./routes/index.js'));
 app.use('/user', require('./routes/user.js'));
 app.use('/product', require('./routes/product.js'));
