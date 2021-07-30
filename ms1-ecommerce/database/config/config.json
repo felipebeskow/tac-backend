@@ -7,17 +7,17 @@
     "dialect": "postgres"
   },
   "test": {
-    "username": "vguzknuf",
-    "password": "jrh5nZV2_rNlHlepfuULiVEgO1rkupVV",
+    "username": "root",
+    "password": null,
     "database": "database_test",
-    "host": "kesavan.db.elephantsql.com",
-    "dialect": "postgres"
+    "host": "127.0.0.1",
+    "dialect": "mysql"
   },
   "production": {
-    "username": "vguzknuf",
-    "password": "jrh5nZV2_rNlHlepfuULiVEgO1rkupVV",
+    "username": "root",
+    "password": null,
     "database": "database_production",
-    "host": "kesavan.db.elephantsql.com",
-    "dialect": "postgres"
+    "host": "127.0.0.1",
+    "dialect": "mysql"
   }
 }
