@@ -1,7 +1,6 @@
 const router = require('express').Router();
 
 const { User } = require('../database/models');
-var id;
 
 router.get('/', async (req, res)=>{
     return res.json( await User.findAll() );
@@ -16,6 +15,7 @@ router.get('/:id', async (req, res)=>{
 
 router.post('/', async (req, res)=>{
     let {name, login, email, password, createdBy, type } = req.body;
+    let id;    
 
     try {
 
