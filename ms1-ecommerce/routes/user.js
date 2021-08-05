@@ -3,16 +3,21 @@ const { User } = require('../database/models');
 const verifyJWT = require('../utils/verifyJWT');
 
 router.get('/', verifyJWT, async (req, res)=>{
-    return res.json( await User.findAll() );
+    //somente admin pode acessar a listagem de todos os usuários
+    if(req.userType == 'Admin') return res.json( await User.findAll() );
+    return res.status(401).send({message: 'usuário não autorizado'});
 });
 
 router.get('/:id', verifyJWT, async (req, res)=>{
+    //se o usuário que não é admin tenta acessar um id que não é o dele é bloqueado
+    if(req.userId != req.params.id && req.userType != 'Admin') return res.status(401).send({message: 'usuário não autorizado'});
 
     const user = await User.findByPk(req.params.id);
 
     return user ? res.json(user) : res.sendStatus(404); 
 });
 
+//para criar o usuário não vai ser necessário estar logado, já que o usuário ainda não tem login
 router.post('/', async (req, res)=>{
     let {name, login, email, password, createdBy, type } = req.body;
     let id;    
@@ -22,10 +27,8 @@ router.post('/', async (req, res)=>{
         if (createdBy == null) {
             id = 'site';
         }
-
-        if (type == null) {
-            type = 'padrão';
-        }
+        //Um admin posteriormente poderá promover esse usuário à Admin
+        type = 'Padrão';
 
         const user = await User.create({
             name,
@@ -43,6 +46,8 @@ router.post('/', async (req, res)=>{
 
 router.put('/:id', verifyJWT, async (req, res)=>{
     let {name, login, email, password, createdBy, type } = req.body;
+    //somente um admin pode promover outro usuário à admin
+    if (type == 'Admin' && req.userType != 'Admin') return res.status(401).send({message: 'usuário não autorizado'});
 
     try {
         let user = await User.findByPk(req.params.id);
@@ -56,6 +61,8 @@ router.put('/:id', verifyJWT, async (req, res)=>{
 });
 
 router.delete('/:id', verifyJWT, async(req, res, next)=>{
+    //somente um admin pode apagar um usuário
+    if (req.userType != 'Admin') return res.status(401).send({message: 'usuário não autorizado'});
     try{
         let user = await User.findByPk(req.params.id);
         if(!user) return res.status(404);
