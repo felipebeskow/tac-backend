@@ -1,12 +1,12 @@
 const router = require('express').Router();
-
 const { User } = require('../database/models');
+const verifyJWT = require('../utils/verifyJWT');
 
-router.get('/', async (req, res)=>{
+router.get('/', verifyJWT, async (req, res)=>{
     return res.json( await User.findAll() );
 });
 
-router.get('/:id', async (req, res)=>{
+router.get('/:id', verifyJWT, async (req, res)=>{
 
     const user = await User.findByPk(req.params.id);
 
@@ -41,7 +41,7 @@ router.post('/', async (req, res)=>{
     }
 });
 
-router.put('/:id', async (req, res)=>{
+router.put('/:id', verifyJWT, async (req, res)=>{
     let {name, login, email, password, createdBy, type } = req.body;
 
     try {
@@ -55,7 +55,7 @@ router.put('/:id', async (req, res)=>{
     }   
 });
 
-router.delete('/:id', async(req, res, next)=>{
+router.delete('/:id', verifyJWT, async(req, res, next)=>{
     try{
         let user = await User.findByPk(req.params.id);
         if(!user) return res.status(404);
