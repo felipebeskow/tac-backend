@@ -1,5 +1,6 @@
 'use strict';
 
+require('dotenv-safe').config();
 const {User} = require('../models');
 
 module.exports = {
@@ -15,12 +16,14 @@ module.exports = {
     */
 
     await queryInterface.bulkInsert(
-      'User',
+      'Users',
       [{
         name: 'Administrador',
         login: 'admin',
         password: process.env.SECRET,
-        type: 'Admin'
+        type: 'Admin',
+        createdAt: '2021/01/01 00:00',
+        updatedAt: '2021/01/01 00:00'
       }], 
       {}
     );
@@ -33,6 +36,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    await queryInterface.bulkDelete('User', null, {});
+    await queryInterface.bulkDelete('Users', null, {});
   }
 };
