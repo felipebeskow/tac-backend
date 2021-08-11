@@ -18,12 +18,12 @@ function verifyJWT(req, res, next) {
             });
         }
         req.token = jwt.sign({
-              id: decoded.id,
-              type: decoded.type
-            },process.env.SECRET,{
-              expiresIn: 300 //5 minutos
-            }
-          );
+            id: decoded.id,
+            type: decoded.type
+          },process.env.SECRET,{
+            expiresIn: 300 //5 minutos
+          }
+        );
         req.userId = decoded.id;
         req.userType = decoded.type;
         next();

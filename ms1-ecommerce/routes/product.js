@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const { Product } = require('../database/models');
+const verifyJWT = require('../utils/verifyJWT');
 
 router.get('/', async (req, res, next)=>{
     res.json(await Product.findAll());
@@ -12,7 +13,9 @@ router.get('/:id', async (req, res, next)=>{
     return product ? res.json(product) : res.sendStatus(404); 
 });
 
-router.post('/', async (req, res)=>{
+router.post('/', verifyJWT, async (req, res)=>{
+    if (req.userType != 'Admin') return res.status(401).send({message: 'usuário não autorizado'});
+
     let { descricao, fabricante, codBarra, lote, valor } = req.body;
 
     try {
@@ -23,7 +26,9 @@ router.post('/', async (req, res)=>{
     }
 });
 
-router.put('/:id', async (req, res)=>{
+router.put('/:id', verifyJWT, async (req, res)=>{
+    if (req.userType != 'Admin') return res.status(401).send({message: 'usuário não autorizado'});
+
     let { descricao, fabricante, codBarra, lote, valor } = req.body;
 
     try {
@@ -37,7 +42,8 @@ router.put('/:id', async (req, res)=>{
     }   
 });
 
-router.delete('/:id', async(req, res, next)=>{
+router.delete('/:id', verifyJWT, async(req, res, next)=>{
+    if (req.userType != 'Admin') return res.status(401).send({message: 'usuário não autorizado'});
     try{
         let product = await Product.findByPk(req.params.id);
         if(!product) return res.status(404);

@@ -22,6 +22,7 @@ module.exports = {
         login: 'admin',
         password: process.env.SECRET,
         type: 'Admin',
+        createdBy: 'admin',
         createdAt: '2021/01/01 00:00',
         updatedAt: '2021/01/01 00:00'
       }], 
