@@ -9,7 +9,7 @@ A proposta é desenvolver duas REST-API em NodeJS, uma API de um ecommerce com a
 - [✅] Sequelize
 - [✅] Token JWT
 - [✅] Cadastro de usuários
-- [ ... ] Cadastro de produtos
+- [✅] Cadastro de produtos
 - [ ... ] Cadastro de pedidos
 - [✅] Segurança de recursos
 - [ ... ] Validar objetos recebidos
