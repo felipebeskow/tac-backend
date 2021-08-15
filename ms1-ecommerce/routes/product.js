@@ -4,13 +4,25 @@ const { Product } = require('../database/models');
 const verifyJWT = require('../utils/verifyJWT');
 
 router.get('/', async (req, res, next)=>{
-    res.json(await Product.findAll());
+    let products = await Product.findAll();
+
+    if (products) {
+        return res.status(200).json(products);
+    } else {        
+        return res.status(400).json({
+            token: req.token,
+            error: 'Produtos não encontrados'
+        });
+    }
 });
 
 router.get('/:id', async (req, res, next)=>{
     const product = await Product.findByPk(req.params.id);
 
-    return product ? res.json(product) : res.sendStatus(404); 
+    return product ? res.json(product) : res.status(404).json({
+        token: req.token,
+        error: 'Produto não encontrado'
+    });; 
 });
 
 router.post('/', verifyJWT, async (req, res)=>{
@@ -20,9 +32,15 @@ router.post('/', verifyJWT, async (req, res)=>{
 
     try {
         const product = await Product.create({ descricao, fabricante, codBarra, lote, valor });
-        return res.json(product);
-    } catch(e) {
-        return res.status(400).json(e);
+        return res.json({
+            token: req.token,
+            product
+        });
+    } catch(error){
+        return res.status(400).json({
+            token: req.token,
+            error
+        });
     }
 });
 
@@ -36,9 +54,15 @@ router.put('/:id', verifyJWT, async (req, res)=>{
         if(!product) return res.status(404);
 
         await product.update({ descricao, fabricante, codBarra, lote, valor });
-        return res.json(product);
-    } catch(e) {
-        return res.status(400).json(e);
+        return res.json({
+            token: req.token,
+            product
+        });
+    } catch(error){
+        return res.status(400).json({
+            token: req.token,
+            error
+        });
     }   
 });
 
@@ -49,9 +73,12 @@ router.delete('/:id', verifyJWT, async(req, res, next)=>{
         if(!product) return res.status(404);
 
         await product.destroy();
-        return res.send();
-    } catch(e){
-        res.status(400).json(e);
+        return res.json({ token: req.token });
+    } catch(error){
+        return res.status(400).json({
+            token: req.token,
+            error
+        });
     }
 });
 

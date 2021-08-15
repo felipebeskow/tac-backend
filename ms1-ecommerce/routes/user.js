@@ -5,13 +5,16 @@ const verifyJWT = require('../utils/verifyJWT');
 router.get('/', verifyJWT, async (req, res)=>{
     //somente admin pode acessar a listagem de todos os usuários
     if(req.userType == 'Admin') {
-        let user =  await User.findAll();
+        let users =  await User.findAll();
         return res.json( {
             token: req.token,
-            user
+            users
         } );
     }
-    return res.status(401).send({message: 'usuário não autorizado'});
+    return res.status(401).send({
+        token: req.token,
+        error: "Usuário não autorizado"
+    });
 });
 
 router.get('/:id', verifyJWT, async (req, res)=>{
@@ -26,7 +29,10 @@ router.get('/:id', verifyJWT, async (req, res)=>{
             user
         });
     } else
-        return res.sendStatus(404); 
+        return res.status(404).json({
+            token: req.token,
+            error: "Usuário não encontrado"
+        }); 
 });
 
 //para criar o usuário não vai ser necessário estar logado, já que o usuário ainda não tem login
@@ -54,15 +60,21 @@ router.post('/', async (req, res)=>{
             token: req.token,
             user
         });
-    } catch(e) {
-        return res.status(400).json(e);
+    } catch(error) {
+        return res.status(400).json({
+            token: req.token,
+            error
+        });
     }
 });
 
 router.put('/:id', verifyJWT, async (req, res)=>{
     let {name, login, email, password, createdBy, type } = req.body;
     //somente um admin pode promover outro usuário à admin
-    if (type != req.params.id || req.userType != 'Admin') return res.status(401).send({message: 'usuário não autorizado'});
+    if (type != req.params.id || req.userType != 'Admin') return res.status(401).send({
+        token: req.token,
+        message: 'usuário não autorizado'
+    });
 
     try {
         let user = await User.findByPk(req.params.id);
@@ -73,8 +85,11 @@ router.put('/:id', verifyJWT, async (req, res)=>{
             token: req.token,
             user
         });
-    } catch(e) {
-        return res.status(400).json(e);
+    } catch(error) {
+        return res.status(400).json({
+            token: req.token,
+            error
+        });
     }   
 });
 
@@ -87,8 +102,11 @@ router.delete('/:id', verifyJWT, async(req, res, next)=>{
 
         await user.destroy();
         return res.json({ token: req.token });
-    } catch(e){
-        res.status(400).json(e);
+    } catch(error){
+        return res.status(400).json({
+            token: req.token,
+            error
+        });
     }
 });
 

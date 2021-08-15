@@ -10,9 +10,10 @@ A proposta é desenvolver duas REST-API em NodeJS, uma API de um ecommerce com a
 - [✅] Token JWT
 - [✅] Cadastro de usuários
 - [✅] Cadastro de produtos
-- [ ... ] Cadastro de pedidos
+- [✅] Cadastro de pedidos
 - [✅] Segurança de recursos
-- [ ... ] Validar objetos recebidos
+- [✅] Validar objetos recebidos
+- [❌] Homologar API
 
 ## Serviço 2 - Avaliador
 - [ ... ] Framework REST: Restify
