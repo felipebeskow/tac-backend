@@ -1,6 +1,6 @@
-const { verifyJWT, getOrderProdutc, postOrderProduct } = require('../utils/');
-const { Order, OrderProduct } = require('../database/');
-const orderproduct = require('../database/models/orderproduct');
+const verifyJWT = require('../utils/verifyJWT');
+const {getOrderProdutc, postOrderProduct } = require('../utils/orderProduct');
+const { Order, OrderProduct } = require('../database/models');
 const router = require('express').Router();
 
 router.get('/', verifyJWT, async (req, res, next)=>{
@@ -26,11 +26,12 @@ router.get('/', verifyJWT, async (req, res, next)=>{
 router.get('/:id', verifyJWT, async (req, res, next)=>{
     try{
         let order = await Order.findByPk(req.params.id);
-
-        if ( req.userType == 'Admin' || req.idUser == order.idUser ) return res.json({
-            token: req.token,
-            getOrderProdutc(order)
-        });
+        let orderProduct = getOrderProdutc(order);
+        if ( req.userType == 'Admin' || req.idUser == order.idUser ) 
+            return res.json({
+                token: req.token,
+                orderProduct
+            });
 
     } catch(error){
         return res.status(400).json({

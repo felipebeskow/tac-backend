@@ -1,0 +1,27 @@
+{
+  "name": "ms2-rateproducts",
+  "version": "1.0.0",
+  "description": "Microserviço de avaliação de produtos",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/felipebeskow/tac-backend.git"
+  },
+  "author": "Felipe Beskow",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/felipebeskow/tac-backend/issues"
+  },
+  "homepage": "https://github.com/felipebeskow/tac-backend#readme",
+  "dependencies": {
+    "dotenv-safe": "^8.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.7",
+    "restify": "^8.5.1"
+  }
+}
