@@ -20,12 +20,12 @@ mongoose.connect(process.env.MONGO_URL, {
   });
 
 const verifyJWT = require('./utils/verifyJWT');
-const getProdudtsRate = require('./utils/getProdudtsRate');
+const getProdudtsRate = require('./utils/getProdudtRate');
 const setProdudtsRate = require('./utils/setProdudtsRate');
 
 let server = restify.createServer();
 
-server.get('/product/:id', verifyJWT, getProdudtsRate);
+//erver.get('/product/:id', verifyJWT, getProdudtRate);
 server.post('/rate/:id', verifyJWT, setProdudtsRate);
 
 console.log(process.env.PORT);
