@@ -2,7 +2,7 @@ const { RateProduct } = require('../Models/RateProduct');
 const mongoose = require('mongoose');
 const errors = require('restify-errors');
 
-module.exports = async function setProdudtsRate(req, res, next){
+module.exports = async function setProdudtRate(req, res, next){
     let json = { idProduct, RateProduct, comment } = req.body;
     json.idUser = req.userId
 
