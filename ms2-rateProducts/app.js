@@ -24,9 +24,8 @@ const getProdudtRate = require('./utils/getProdudtRate');
 const setProdudtRate = require('./utils/setProdudtRate');
 
 let server = restify.createServer();
-
-//erver.get('/product/:id', verifyJWT, getProdudtRate);
-server.post('/rate/:id', verifyJWT, setProdudtRate);
+server.get('/product/:id', verifyJWT, getProdudtRate);
+server.post('/rate/', verifyJWT, setProdudtRate);
 
 console.log(process.env.PORT);
 

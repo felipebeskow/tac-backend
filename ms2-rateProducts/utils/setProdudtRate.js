@@ -4,7 +4,7 @@ const errors = require('restify-errors');
 
 module.exports = async function setProdudtRate(req, res, next){
     let json = { idProduct, RateProduct, comment } = req.body;
-    json.idUser = req.userId
+    json.idUser = req.userId;
 
     if ( (await RateProduct.countDocuments({ 
         idUser: json.idUser,  
