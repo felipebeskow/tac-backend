@@ -1,16 +1,40 @@
 const verifyJWT = require('../utils/verifyJWT');
-const getOrderProdutc = require('../utils/orderProduct');
-const postOrderProduct = require('../utils/orderProduct');
-const { Order, OrderProduct } = require('../database/models');
+//const getOrderProdutc = require('../utils/getOrderProduct');
+const postOrderProduct = require('../utils/postOrderProduct');
+const { Order, OrderProduct, Product } = require('../database/models');
 const router = require('express').Router();
 
 router.get('/', verifyJWT, async (req, res, next)=>{
+    let orders;
     try {
-        let orders = await Order.findAll();
+        orders = await Order.findAll();
+        
+        let ordersComplete = [];
 
-        let ordersComplete = orders.map(order=>{
-            if ( req.userType == 'Admin' || req.idUser == order.idUser ) return getOrderProdutc(order);
-        });
+        for( let order of orders){
+            //if ( req.userType == 'Admin' || req.idUser == order.idUser ) return getOrderProdutc(order);
+            let products = [];
+        
+            let orderProducts = await OrderProduct.findAll({
+                where: {
+                    idOrder: order.id
+                }
+            });
+    
+            for (let orderProduct of orderProducts){
+                let product = await Product.findByPk(orderProduct.idProduct);
+                products.push({
+                    product
+                });
+            }
+            
+            if ( req.userType == 'Admin' || req.idUser == order.idUser ) 
+                ordersComplete.push({
+                    order,
+                    orderProducts,
+                    products
+                });
+        };
 
         return res.json({
             token: req.token,
@@ -27,6 +51,42 @@ router.get('/', verifyJWT, async (req, res, next)=>{
 router.get('/:id', verifyJWT, async (req, res, next)=>{
     try{
         let order = await Order.findByPk(req.params.id);
+        
+        let products = [];
+        
+        let orderProducts = await OrderProduct.findAll({
+            where: {
+                idOrder: order.id
+            }
+        });
+
+        for (let orderProduct of orderProducts){
+            let product = await Product.findByPk(orderProduct.idProduct);
+            products.push({
+                orderProduct,
+                product
+            });
+        }
+        
+        if ( req.userType == 'Admin' || req.idUser == order.idUser ) 
+            return res.json({
+                token: req.token,
+                order,
+                orderProducts,
+                products
+            });
+
+    } catch(error){
+        return res.status(400).json({
+            token: req.token,
+            error
+        });
+    }
+});
+/*
+router.get('/:id', verifyJWT, async (req, res, next)=>{
+    try{
+        let order = await Order.findByPk(req.params.id);
         let orderProduct = getOrderProdutc(order);
         if ( req.userType == 'Admin' || req.idUser == order.idUser ) 
             return res.json({
@@ -40,20 +100,18 @@ router.get('/:id', verifyJWT, async (req, res, next)=>{
             error
         });
     }
-});
+});*/
 
 router.post('/', verifyJWT, async(req, res, next)=>{
-    let ponto = "começo";
     try {
         let { idUser, dataFaturamento, pais, estado, cidade, cep, logradouro, numero, statusId, status, obs, products } = req.body;
         let { token, userId, userType } = req;
 
 
-        if(userType != 'Admin' || idUser!=userId) return res.status(401).json({
+        if(userType != 'Admin' && idUser!=userId) return res.status(401).json({
             token,
             error: 'Usuário não autorizado'
         });
-        ponto = "antes da inserção do order";
         let order = await Order.create({
             idUser,
             dataFaturamento,
@@ -67,11 +125,9 @@ router.post('/', verifyJWT, async(req, res, next)=>{
             status, 
             obs
         });
-        ponto = "depois da inserção do order e antes da orderprocts";
         
         let orderProduct = await postOrderProduct({ idUser, idOrder:order.id, }, products);
 
-        ponto = "depois da inserção do orderproduct e antes do res";
 
         if (orderProduct) return res.status(200).json({
             token,
@@ -83,88 +139,78 @@ router.post('/', verifyJWT, async(req, res, next)=>{
     } catch(error){
         return res.status(400).json({
             token: req.token,
-            error,
-            message: "Deu pau no " + ponto
-        });
-    }
-});
-
-router.put('/:id', verifyJWT, (req, res, next)=>{
-    try {
-        let { idUser, dataFaturamento, pais, estado, cidade, cep, logradouro, numero, statusId, status, obs, products } = req.body;
-        let { token, userId, userType } = req;
-
-        if(userType != 'Admin' || idUser!=userId) return res.status(401).json({
-            token,
-            error: 'Usuário não autorizado'
-        });
-
-        let order = Order.findByPk(rep.params.id);
-
-        if (!order) return res.status(404);
-
-        let orderProducts = OrderProduct.findAll({
-            where:{
-                idOrder: order.id
-            }
-        });
-
-        orderProducts.map(orderproduct=>{
-            orderproduct.destroy();
-        });
-
-        order.update({
-            idUser,
-            dataFaturamento,
-            pais, 
-            estado,
-            cidade,
-            cep,
-            logradouro,
-            numero,
-            statusId,
-            status, 
-            obs
-        });
-
-        orderProducts = postOrderProduct(order);
-
-        if (orderProduct) return res.status(200).json({
-            token,
-            orderProducts
-        });
-
-        
-    } catch(error){
-        return res.status(400).json({
-            token: req.token,
             error
         });
     }
 });
 
-router.delete('/:id', verifyJWT, (req, res, next)=>{
-    try {
-        let { token, userId, userType } = req;
-        
-        let order = Order.findByPk(req.params.id);
+//atualiza apenas o status do pedido, já que o pedido foi fechado mesmo
+router.put('/:id', verifyJWT, async (req, res, next)=>{
+    
+    let { dataFaturamento, statusId, status, obs } = req.body;
+    let { token, userId, userType } = req;
 
-        if(userType != 'Admin' || order.idUser!=userId) return res.status(401).json({
+    try {
+
+
+        let order = await Order.findByPk(req.params.id);
+        
+        if(userType != 'Admin' && order.idUser!=userId) return res.status(401).json({
             token,
             error: 'Usuário não autorizado'
         });
 
-        let orderProducts = OrderProduct.findAll({
-            where: {
-                idOrder:order.id
-            }
+        if (!order) return res.status(404);
+
+        let aux = order;
+        if (dataFaturamento) aux.dataFaturamento = dataFaturamento;
+        if (statusId) aux.statusId = statusId;
+        if (status) aux.status = status;
+        if (obs) aux.obs = obs;
+
+        await order.update({
+            dataFaturamento,
+            statusId,
+            status,
+            obs
         });
 
-        orderProducts.map(orderproduct=>{
-            orderproduct.destroy();
+
+        return res.json(order);
+        
+    } catch(error){
+        return res.status(500).json({
+            token: req.token,
+            error: error
+        });
+    }
+});
+
+router.delete('/:id', verifyJWT, async (req, res, next)=>{
+    
+    let { token, userId, userType } = req;
+    try {
+        
+        let order = await Order.findByPk(req.params.id);
+
+        if(userType != 'Admin' && order.idUser!=userId) return res.status(401).json({
+            token,
+            error: 'Usuário não autorizado'
         });
 
-        order.destroy();
+        if (order){
+            let orderProducts = await OrderProduct.findAll({
+                where: {
+                    idOrder:order.id
+                }
+            });
+
+            if (orderProducts) for (let orderproduct of orderProducts){
+                orderproduct.destroy();
+            };
+    
+            order.destroy();
+        }
         res.status(200).json({ token });
 
     } catch(error){
