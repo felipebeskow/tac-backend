@@ -19,7 +19,10 @@ router.get('/', verifyJWT, async (req, res)=>{
 
 router.get('/:id', verifyJWT, async (req, res)=>{
     //se o usuário que não é admin tenta acessar um id que não é o dele é bloqueado
-    if(req.userId != req.params.id || req.userType != 'Admin') return res.status(401).send({message: 'usuário não autorizado'});
+    if(req.userId != req.params.id && req.userType != 'Admin') return res.status(401).send({ 
+        token: req.token, 
+        message: `usuário ${req.params.id} não autorizado`
+    });
 
     let user = await User.findByPk(req.params.id);
 
@@ -38,13 +41,9 @@ router.get('/:id', verifyJWT, async (req, res)=>{
 //para criar o usuário não vai ser necessário estar logado, já que o usuário ainda não tem login
 router.post('/', async (req, res)=>{
     let {name, login, email, password, createdBy, type } = req.body;
-    let id;    
 
     try {
 
-        if (createdBy == null) {
-            id = 'site';
-        }
         //Um admin posteriormente poderá promover esse usuário à Admin
         type = 'Padrão';
 
@@ -53,7 +52,7 @@ router.post('/', async (req, res)=>{
             login,
             email,
             password,
-            createdBy: id,
+            createdBy,
             type
         });
         return res.json({
@@ -71,9 +70,9 @@ router.post('/', async (req, res)=>{
 router.put('/:id', verifyJWT, async (req, res)=>{
     let {name, login, email, password, createdBy, type } = req.body;
     //somente um admin pode promover outro usuário à admin
-    if (type != req.params.id || req.userType != 'Admin') return res.status(401).send({
+    if (req.userId != req.params.id && req.userType != 'Admin') return res.status(401).send({
         token: req.token,
-        message: 'usuário não autorizado'
+        message: `usuário ${req.params.id} não autorizado`
     });
 
     try {

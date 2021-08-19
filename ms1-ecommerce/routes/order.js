@@ -1,5 +1,6 @@
 const verifyJWT = require('../utils/verifyJWT');
-const {getOrderProdutc, postOrderProduct } = require('../utils/orderProduct');
+const getOrderProdutc = require('../utils/orderProduct');
+const postOrderProduct = require('../utils/orderProduct');
 const { Order, OrderProduct } = require('../database/models');
 const router = require('express').Router();
 
@@ -42,14 +43,17 @@ router.get('/:id', verifyJWT, async (req, res, next)=>{
 });
 
 router.post('/', verifyJWT, async(req, res, next)=>{
+    let ponto = "começo";
     try {
         let { idUser, dataFaturamento, pais, estado, cidade, cep, logradouro, numero, statusId, status, obs, products } = req.body;
         let { token, userId, userType } = req;
+
 
         if(userType != 'Admin' || idUser!=userId) return res.status(401).json({
             token,
             error: 'Usuário não autorizado'
         });
+        ponto = "antes da inserção do order";
         let order = await Order.create({
             idUser,
             dataFaturamento,
@@ -63,11 +67,15 @@ router.post('/', verifyJWT, async(req, res, next)=>{
             status, 
             obs
         });
+        ponto = "depois da inserção do order e antes da orderprocts";
         
-        let orderProduct = postOrderProduct(order);
+        let orderProduct = await postOrderProduct({ idUser, idOrder:order.id, }, products);
+
+        ponto = "depois da inserção do orderproduct e antes do res";
 
         if (orderProduct) return res.status(200).json({
             token,
+            order,
             orderProduct
         });
 
@@ -75,7 +83,8 @@ router.post('/', verifyJWT, async(req, res, next)=>{
     } catch(error){
         return res.status(400).json({
             token: req.token,
-            error
+            error,
+            message: "Deu pau no " + ponto
         });
     }
 });

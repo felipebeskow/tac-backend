@@ -21,7 +21,7 @@ function verifyJWT(req, res, next) {
             id: decoded.id,
             type: decoded.type
           },process.env.SECRET,{
-            expiresIn: 300 //5 minutos
+            expiresIn: 10000 //5 minutos
           }
         );
         req.userId = decoded.id;

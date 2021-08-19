@@ -13,7 +13,11 @@ A proposta é desenvolver duas REST-API em NodeJS, uma API de um ecommerce com a
 - [✅] Cadastro de pedidos
 - [✅] Segurança de recursos
 - [✅] Validar objetos recebidos
-- [❌] Homologar API
+- [✅] Homologar API
+    - [✅] Login
+    - [✅] User
+    - [✅] Product
+    - [✅] Order
 
 ## Serviço 2 - Avaliador
 - [✅] Framework REST: Restify
@@ -21,4 +25,4 @@ A proposta é desenvolver duas REST-API em NodeJS, uma API de um ecommerce com a
 - [✅] Mongoose
 - [✅] Cadastro da nota de um produto
 - [✅] Um login não pode ter mais de uma nota por produto
-- [❌] Homologar API
+- [ ... ] Homologar API
