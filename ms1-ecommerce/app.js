@@ -9,7 +9,6 @@ var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
 var orderRouter = require('./routes/order');
 var productRouter = require('./routes/product');
-const { verify } = require('crypto');
 
 var app = express();
 
