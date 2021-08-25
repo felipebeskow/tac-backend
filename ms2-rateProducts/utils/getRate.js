@@ -1,7 +1,7 @@
 const verifyJWT = require('./verifyJWT');
 const RateProduct = require('../Models/RateProduct');
 const errors = require('restify-errors');
-const getProductRates = require('../../ms2-bkp/utils/getProductRates');
+//const getProductRates = require('../../ms2-bkp/utils/getProductRates');
 
 const handleRate = async (req, res, next) => {
     let { idProduct } = req.params;
